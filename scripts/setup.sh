@@ -23,7 +23,7 @@ step() { STEP=$((STEP + 1)); echo ""; echo "── Step ${STEP}/${TOTAL}: $* ─
 
 echo "╔══════════════════════════════════════════╗"
 echo "║      OpenClaw Memory DL Setup          ║"
-echo "║           Version: stable               ║"
+echo "║           Version: 1.0.0                ║"
 echo "╚══════════════════════════════════════════╝"
 
 # ─── Step 1: 检查 .env ───
