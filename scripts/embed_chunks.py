@@ -12,6 +12,27 @@ import hashlib
 from pathlib import Path
 
 
+def load_manifest(manifest_path):
+    if not manifest_path.exists():
+        return set()
+
+    try:
+        with manifest_path.open("r", encoding="utf-8") as f:
+            data = json.load(f)
+    except Exception:
+        return set()
+
+    chunk_ids = data.get("chunk_ids", [])
+    return {item for item in chunk_ids if isinstance(item, str)}
+
+
+def save_manifest(manifest_path, chunk_ids):
+    manifest_path.parent.mkdir(parents=True, exist_ok=True)
+    payload = {"chunk_ids": sorted(chunk_ids)}
+    with manifest_path.open("w", encoding="utf-8") as f:
+        json.dump(payload, f, ensure_ascii=False, indent=2)
+
+
 def main():
     if len(sys.argv) < 2:
         print("用法: python3 embed_chunks.py <temp_json_file>")
@@ -30,6 +51,28 @@ def main():
 
     if not chunks:
         print("无可向量化内容")
+        return
+
+    lancedb_path = config.get("lancedb_path", "./semantic_index")
+    table_name = config.get("table_name", "openclaw_memory")
+    manifest_path = Path(lancedb_path) / ".indexed_chunks.json"
+
+    prepared_records = []
+    for chunk in chunks:
+        chunk_id = hashlib.md5(
+            f"{chunk['source']}:{chunk['chunk_idx']}:{chunk.get('timestamp', 0)}".encode()
+        ).hexdigest()[:16]
+        prepared_records.append((chunk_id, chunk))
+
+    known_ids = load_manifest(manifest_path)
+    pending_records = [(chunk_id, chunk) for chunk_id, chunk in prepared_records if chunk_id not in known_ids]
+    skipped = len(prepared_records) - len(pending_records)
+
+    if skipped:
+        print(f"⏭️ 跳过已存在 chunk: {skipped} 条")
+
+    if not pending_records:
+        print("✅ 无新增 chunk，跳过向量化")
         return
 
     print(f"🔧 加载嵌入模型...")
@@ -54,11 +97,11 @@ def main():
         sys.exit(1)
 
     # 批量嵌入
-    texts = [c["text"] for c in chunks]
+    texts = [chunk["text"] for _, chunk in pending_records]
     batch_size = 32
     total = len(texts)
 
-    print(f"📊 生成 {total} 个嵌入...")
+    print(f"📊 生成 {total} 个新增嵌入...")
     embeddings = []
     for i in range(0, total, batch_size):
         batch = texts[i : i + batch_size]
@@ -68,9 +111,6 @@ def main():
         print(f"   进度: {done}/{total}")
 
     # 写入 LanceDB
-    lancedb_path = config.get("lancedb_path", "./semantic_index")
-    table_name = config.get("table_name", "openclaw_memory")
-
     print(f"💾 写入 LanceDB ({lancedb_path}/{table_name})...")
 
     try:
@@ -82,12 +122,7 @@ def main():
 
     db = lancedb.connect(lancedb_path)
     records = []
-
-    for i, chunk in enumerate(chunks):
-        chunk_id = hashlib.md5(
-            f"{chunk['source']}:{chunk['chunk_idx']}:{chunk.get('timestamp', 0)}".encode()
-        ).hexdigest()[:16]
-
+    for i, (chunk_id, chunk) in enumerate(pending_records):
         records.append(
             {
                 "id": chunk_id,
@@ -115,7 +150,9 @@ def main():
             db.create_table(table_name, data=records)
             print(f"   创建新表并写入 {len(records)} 条")
 
-        print(f"✅ 完成: {len(records)} 条向量已写入")
+        known_ids.update(chunk_id for chunk_id, _ in pending_records)
+        save_manifest(manifest_path, known_ids)
+        print(f"✅ 完成: {len(records)} 条新增向量已写入")
     except Exception as e:
         print(f"❌ 写入 LanceDB 失败: {e}")
         sys.exit(1)

@@ -58,9 +58,33 @@ echo "🔄 开始恢复..."
 # 2. 向量库
 {
     if [ -d "$RESTORED_DIR/semantic_index" ]; then
-        rm -rf "$PROJECT_ROOT/semantic_index"
-        cp -r "$RESTORED_DIR/semantic_index" "$PROJECT_ROOT/"
-        echo "  ✅ LanceDB 向量库"
+        STAGED_INDEX_DIR="$TEMP_DIR/semantic_index.restored"
+        CURRENT_INDEX_DIR="$PROJECT_ROOT/semantic_index"
+        SAFETY_BACKUP_DIR="$PROJECT_ROOT/semantic_index.pre-restore.$(date +%Y%m%d_%H%M%S)"
+
+        cp -R "$RESTORED_DIR/semantic_index" "$STAGED_INDEX_DIR"
+
+        if [ ! -d "$STAGED_INDEX_DIR" ]; then
+            echo "  ❌ 向量库暂存失败"
+            false
+        fi
+
+        if [ -d "$CURRENT_INDEX_DIR" ]; then
+            mv "$CURRENT_INDEX_DIR" "$SAFETY_BACKUP_DIR"
+        else
+            SAFETY_BACKUP_DIR=""
+        fi
+
+        if mv "$STAGED_INDEX_DIR" "$CURRENT_INDEX_DIR"; then
+            echo "  ✅ LanceDB 向量库"
+            if [ -n "$SAFETY_BACKUP_DIR" ]; then
+                echo "  ℹ️ 旧向量库已备份到: $SAFETY_BACKUP_DIR"
+            fi
+        else
+            [ -n "$SAFETY_BACKUP_DIR" ] && mv "$SAFETY_BACKUP_DIR" "$CURRENT_INDEX_DIR"
+            echo "  ❌ 向量库切换失败，已回滚"
+            false
+        fi
     else
         echo "  ⏭️ 跳过 (备份中无向量库)"
     fi
