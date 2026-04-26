@@ -1,0 +1,21 @@
+{
+  "model": "BAAI/bge-m3",
+  "hf_endpoint": "https://hf-mirror.com",
+  "vector_db": "lancedb",
+  "lancedb_path": "./semantic_index",
+  "table_name": "openclaw_memory",
+  "vector_dim": 1024,
+  "chunk_size": 500,
+  "overlap": 50,
+  "max_length": 512,
+  "search_overfetch_factor": 2,
+  "reranker_enabled": true,
+  "reranker_model": "BAAI/bge-reranker-v2-m3",
+  "reranker_batch_size": 16,
+  "reranker_top_n": 24,
+  "hybrid_enabled": true,
+  "vector_weight": 0.6,
+  "keyword_weight": 0.4,
+  "keyword_index_path": "./semantic_index/keyword_index.json",
+  "description": "混合检索配置 - BGE-M3 + LanceDB + BM25 + BGE Reranker"
+}

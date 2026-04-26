@@ -1,0 +1,47 @@
+{
+  "_comment": "OpenClaw 记忆层配置模板 — 复制到 ~/.openclaw/ 或 workspace/ 中使用",
+  "memory": {
+    "markdown": {
+      "enabled": true,
+      "long_term": "MEMORY.md",
+      "daily_pattern": "memory/YYYY-MM-DD.md",
+      "hot_memory": "memory/hot/HOT_MEMORY.md",
+      "compact_threshold_percent": 80
+    },
+    "memos": {
+      "enabled": true,
+      "url": "http://localhost:5230",
+      "token_env": "MEMOS_TOKEN",
+      "api_version": "v1"
+    },
+    "vector_db": {
+      "enabled": true,
+      "type": "lancedb",
+      "path": "./semantic_index",
+      "embedding_model": "BAAI/bge-m3",
+      "vector_dim": 1024,
+      "table_name": "openclaw_memory",
+      "hybrid_search": true,
+      "reranker": {
+        "enabled": true,
+        "model": "BAAI/bge-reranker-v2-m3",
+        "top_n": 24,
+        "batch_size": 16
+      }
+    },
+    "mysql": {
+      "enabled": true,
+      "host": "localhost",
+      "port": 3306,
+      "database": "openclaw_business",
+      "user": "openclaw",
+      "password_env": "MYSQL_PASSWORD",
+      "charset": "utf8mb4"
+    },
+    "search_priority": {
+      "historical_decision": ["markdown", "memos", "vector_db"],
+      "historical_document": ["vector_db", "markdown"],
+      "business_data": ["mysql", "vector_db"]
+    }
+  }
+}

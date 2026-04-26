@@ -1,0 +1,16 @@
+{
+  "name": "openclaw-memory-dl",
+  "version": "1.0.0",
+  "description": "OpenClaw Agent 混合记忆架构部署包",
+  "private": true,
+  "scripts": {
+    "vectorize": "node scripts/vectorize.js",
+    "vectorize:today": "node scripts/vectorize.js --today",
+    "health": "bash scripts/health-check.sh",
+    "backup": "bash scripts/backup.sh",
+    "setup": "bash scripts/setup.sh"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

@@ -1,0 +1,47 @@
+# ═══════════════════════════════════════════
+# OpenClaw Memory DL - .gitignore
+# ═══════════════════════════════════════════
+
+# ─── 数据文件 (不应提交) ───
+.env
+MEMORY.md
+memory/*
+!memory/.gitkeep
+semantic_index/*
+!semantic_index/.gitkeep
+backups/
+.rag_backup/
+sellersprite_export/
+截图/
+下载/
+
+# ─── Python ───
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+*.whl
+.venv/
+venv/
+
+# ─── Node.js ───
+node_modules/
+*.log
+*.tsbuildinfo
+
+# ─── 临时文件 ───
+.vectorize_temp.json
+*.tmp
+*.bak
+.DS_Store
+Thumbs.db
+
+# ─── IDE ───
+.vscode/
+.idea/
+*.swp
+*.swo
