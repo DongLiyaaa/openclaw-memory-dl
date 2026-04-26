@@ -87,7 +87,7 @@ openclaw-memory-dl/
 ├── .env.example                # 环境变量模板
 ├── .gitignore
 ├── package.json                # npm scripts
-├── requirements.txt            # Python 依赖 (版本锁定)
+├── requirements.txt            # Python 依赖 (兼容范围约束)
 ├── config/
 │   ├── rag-config.json         # RAG 配置
 │   └── openclaw-memory.json    # OpenClaw 配置模板
@@ -117,7 +117,7 @@ openclaw-memory-dl/
 - **嵌入模型**: BAAI/bge-m3 (1024 维)
 - **重排序**: BAAI/bge-reranker-v2-m3
 - **轻量记忆**: Memos (自托管, `neosmemo/memos:stable`)
-- **结构化数据**: MySQL 8.0 (`mysql:8.0.40`)
+- **结构化数据**: MySQL 8.0 (`mysql:8.0`)
 - **混合检索**: 向量 (0.6) + BM25 (0.4) + Reranker
 
 ## License

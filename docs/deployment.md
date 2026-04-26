@@ -55,8 +55,13 @@ docker run -d \
 
 ### 3. Python 依赖
 
+这里约束的是 Python 包兼容范围，不是把解释器锁死在某个小版本。部署机如果是更新的 Python（例如 3.11 / 3.12），优先直接用该版本创建虚拟环境并安装依赖；只有当某个依赖在该解释器下没有可用 wheel 或安装失败时，再回退到兼容的小版本解释器。
+
 ```bash
-pip install lancedb sentence-transformers
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install -U pip
+python -m pip install -r requirements.txt
 ```
 
 ### 4. 初始化
