@@ -36,7 +36,7 @@ daily.md   :5230       Hybrid    ERP/报表
 
 ```bash
 # 1. 克隆
-git clone https://github.com/<your-org>/openclaw-memory-dl.git
+git clone https://github.com/DongLiyaaa/openclaw-memory-dl.git
 cd openclaw-memory-dl
 
 # 2. 配置
@@ -62,10 +62,10 @@ npm run vectorize:today     # 仅向量化今日文件
 
 # 备份/恢复
 npm run backup              # 全量备份
-bash scripts/restore.sh ./backups/memory-20260426.tar.gz
+bash scripts/restore.sh ./backups/memory-202x-xx-xx.tar.gz
 
 # 语义检索
-python3 scripts/rag_search.py -q "之前怎么定的领星API"
+python3 scripts/rag_search.py -q "广告优化注意事项"
 python3 scripts/rag_search.py -q "广告优化策略" --hybrid --json
 ```
 
@@ -117,7 +117,7 @@ openclaw-memory-dl/
 - **嵌入模型**: BAAI/bge-m3 (1024 维)
 - **重排序**: BAAI/bge-reranker-v2-m3
 - **轻量记忆**: Memos (自托管, `neosmemo/memos:stable`)
-- **结构化数据**: MySQL 8.0 (`mysql:8.0`)
+- **结构化数据**: MySQL 8.0 (`mysql:8.0`)，根据自己需求调整数据库
 - **混合检索**: 向量 (0.6) + BM25 (0.4) + Reranker
 
 ## License
